@@ -36,69 +36,52 @@ def table_exists():
 #packet = sniff(count=5)
 #packet.summary()
 
-def test():
-    response = sr1(IP(dst="192.168.1.12") / ICMP())
+def snifferFunction():
+    # Sniffing the enp0s3 interface for IP packets, storing is true
+    packets = sniff(iface="enp0s3", filter="ip", store=True, count=25) 
+    protocol = ''
 
     # Fixing the timestamp from the response
-    fixedTime = datetime.fromtimestamp(response.time)
-    print(fixedTime)
+    fixedTime = datetime.fromtimestamp(packets[1].time)
 
-    # Separating the data in a list && adding a timestamp
-    response = f"{response}"
-    splitedResp = response.split()
     
-    splitedResp.insert(0, fixedTime)
+    le = len(packets)
+    print(le)
 
-    # separating into variables the: timestamp, source ip, destination ip and protocol used
-    timestp = str(splitedResp[0])
-    src_ip = str(splitedResp[4])
-    dst_ip = str(splitedResp[6])
-    protoc = str(splitedResp[3])
+    i = 0
+    while i < le:
+        # Converting the number related to the protocol to its formal name
+        protoNum = packets[i][IP].proto
 
-    print('==========================================')
-    print('timestamp ', timestp)
-    print('source ', src_ip)
-    print('destination ', dst_ip)
-    print('protocvol ', protoc)
+        if protoNum == 1:
+            protocol = 'ICMP'
+        elif protoNum == 6:
+            protocol = 'TCP'
+        elif protoNum == 17:
+            protocol = 'TCP'
 
+        timestp = str(fixedTime)
+        src_mac = str(packets[i][Ether].src)
+        dst_mac = str(packets[i][Ether].dst)
+        src_ip = str(packets[i][IP].src)
+        dst_ip = str(packets[i][IP].dst)
+        protoc = str(protocol)
 
-    # Inserting data into the database
-        # You can use F-STRING to make the database unsafe for SQL Injection
-    cursor.execute("""
+        # Inserting data into the database
+            # You can use F-STRING to make the database unsafe for SQL Injection
+        cursor.execute("""
         INSERT INTO network_events
-        (timestamp, src_ip, dst_ip, protocol)
-        VALUES (%s, %s, %s, %s)
-    """,
-    (timestp, src_ip, dst_ip, protoc)
-    )
+        (timestamp, src_mac, dst_mac, src_ip, dst_ip, protocol)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """,
+        (timestp, src_mac, dst_mac, src_ip, dst_ip, protoc)
+        )
 
-    conn.commit() # Don't forget to commit the changes into the db
+        conn.commit() # Don't forget to commit the changes into the db
 
+        i = i + 1
 
-packets = sniff(iface="enp0s3", filter="ip", store=True, count=5) 
-protocol = ''
-
-print(packets[1].show())
-
-fixedTime = datetime.fromtimestamp(packets[1].time)
-
-print(fixedTime)
-print(packets[1][Ether].src)
-print(packets[1][Ether].dst)
-
-print(packets[1][IP].src)
-print(packets[1][IP].dst)
-print(packets[1][IP].proto)
-
-protoNum = packets[1][IP].proto
-
-if protoNum == 1:
-    protocol = 'ICMP'
-elif protoNum == 6:
-    protocol = 'TCP'
-elif protoNum == 17:
-    protocol = 'TCP'
-
+snifferFunction()
 table_exists()
 
 
