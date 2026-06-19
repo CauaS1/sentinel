@@ -5,7 +5,7 @@ import mariadb
 conn = mariadb.connect(
     user="root",
     password="1234567",
-    database="soc_lab"
+    database="soc_lab" # try deleting this line to see if i can create a logic to check the exitence of this db
 )   
 
 cursor = conn.cursor() # Tool that talks to the database
@@ -24,10 +24,12 @@ def table_exists():
     if res == 0:
         cursor.execute("""CREATE TABLE network_events ( \
         packet INT AUTO_INCREMENT PRIMARY KEY, \
-        timestamp VARCHAR(40), \
+        timestamp VARCHAR(40),
+        src_mac VARCHAR(20),
+        dst_mac VARCHAR(20), 
         src_ip VARCHAR(15),
         dst_ip VARCHAR(15),
-        protocol VARCHAR(8)) \
+        protocol VARCHAR(8)) 
     """)
 
 
@@ -35,7 +37,7 @@ def table_exists():
 #packet.summary()
 
 def test():
-    response = sr1(IP(dst="192.168.1.1") / ICMP())
+    response = sr1(IP(dst="192.168.1.12") / ICMP())
 
     # Fixing the timestamp from the response
     fixedTime = datetime.fromtimestamp(response.time)
@@ -73,11 +75,32 @@ def test():
     conn.commit() # Don't forget to commit the changes into the db
 
 
-    
+packets = sniff(iface="enp0s3", filter="ip", store=True, count=5) 
+protocol = ''
 
+print(packets[1].show())
+
+fixedTime = datetime.fromtimestamp(packets[1].time)
+
+print(fixedTime)
+print(packets[1][Ether].src)
+print(packets[1][Ether].dst)
+
+print(packets[1][IP].src)
+print(packets[1][IP].dst)
+print(packets[1][IP].proto)
+
+protoNum = packets[1][IP].proto
+
+if protoNum == 1:
+    protocol = 'ICMP'
+elif protoNum == 6:
+    protocol = 'TCP'
+elif protoNum == 17:
+    protocol = 'TCP'
 
 table_exists()
-test()
+
 
     
 
