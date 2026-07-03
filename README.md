@@ -11,7 +11,7 @@ This project was created as a hands-on way to understand how modern network moni
 - IP (source and destination)
 - Protocol
 
-### 🚨Detection Features
+### 🚨 Detection Features
 - Normal Event
   - Packet metadata is stored in the events database.
 - Alert
@@ -22,12 +22,12 @@ This project was created as a hands-on way to understand how modern network moni
 - Log file
   - Every captured packet is recorded in a raw `.log` file.
 
-### Bugs detected to fix
+### ⚠️ Bugs detected to fix
 - [ ] Incorrect request counting across time windows.
     - Currently, requests are accumulated indefinitely. For example, a request made at 2:00 PM and another at 4:00 PM are still counted together, eventually causing legitimate hosts to exceed the configured threshold
 
 
-### Future upgrades
+### 🚀 Future upgrades
   __v 1.0.1__
 - [ ] Docker image for easy deployment
 - [ ] Whitelist
