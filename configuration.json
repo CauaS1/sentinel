@@ -1,0 +1,9 @@
+{
+    "database": { 
+        "interface": "enp0s3", 
+        "count": 8
+    },
+    "blackListThreshold": 50,
+    "test": 1,
+    "option": "Caua"
+}

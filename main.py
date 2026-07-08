@@ -1,5 +1,6 @@
 from scapy.all import *
 from datetime import datetime
+from configuration import jsonConfig #it's the JSON configuration
 import mariadb
 import log
 import firewall
@@ -75,7 +76,7 @@ def table_exists():
 
 def snifferFunction():
     # Sniffing the enp0s3 interface for IP packets, storing is true
-    packets = sniff(iface="enp0s3", filter="ip", store=True, count=5) 
+    packets = sniff(iface=jsonConfig["database"]["interface"], filter="ip", store=True, count=jsonConfig["database"]["count"]) 
     protocol = ''
 
     # Fixing the timestamp from the response
@@ -128,7 +129,6 @@ def floodPacketsAlert():
 
     val = cursor.fetchall()
 
-    print(val)
     # Create a disctionary containing the IP and its packet timestamp 
     ipTimes = {}
     for timestamp, ip in val: 
@@ -212,7 +212,7 @@ def blacklistAdd():
         req = a[3] # Request ammount
         
 
-        if ip not in blackList and req > 50:
+        if ip not in blackList and req > jsonConfig["blackListThreshold"]:
             log.eventLogger(0, 0, ip, 0, 0, level="critical")
             description = f'{ip} made {req} requests within an hour'
 
@@ -242,8 +242,6 @@ def artificialData():
 
         i = i + 1
     
-
-
 
 table_exists()
 blacklistAdd()
