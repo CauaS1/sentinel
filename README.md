@@ -30,7 +30,7 @@ This project was created as a hands-on way to understand how modern network moni
 ### 🚀 Future upgrades
   __v 1.0.1__
 - [ ] Docker image for easy deployment
-- [ ] Whitelist
+- [x] Whitelist
 - [x] JSON configuration file for flexibility
 - [ ] Source / Destination Ports for new analysis and detection rules
 
