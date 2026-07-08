@@ -33,6 +33,8 @@ def table_exists():
         dst_mac VARCHAR(20), 
         src_ip VARCHAR(15),
         dst_ip VARCHAR(15),
+        src_port VARCHAR(5),
+        dst_port VARCHAR(5),
         protocol VARCHAR(8)) 
     """)
         
@@ -119,6 +121,8 @@ def snifferFunction():
         src_ip = str(p[IP].src)
         dst_ip = str(p[IP].dst)
         protoc = str(protocol)
+        dst_port = str(p[TCP].dport)
+        src_port = str(p[TCP].sport)
 
         log.eventLogger(src_mac, dst_mac, src_ip, dst_ip, protoc, level="info")
 
@@ -126,14 +130,13 @@ def snifferFunction():
             # You can use F-STRING to make the database unsafe for SQL Injection
         cursor.execute("""
         INSERT INTO network_events
-        (timestamp, src_mac, dst_mac, src_ip, dst_ip, protocol)
-            VALUES (%s, %s, %s, %s, %s, %s)
+        (timestamp, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, protocol)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """,
-        (timestp, src_mac, dst_mac, src_ip, dst_ip, protoc)
+        (timestp, src_mac, dst_mac, src_ip, dst_ip, src_port, dst_port, protoc)
         )
 
         conn.commit() # Don't forget to commit the changes into the db
-
 
 
 def floodPacketsAlert():
