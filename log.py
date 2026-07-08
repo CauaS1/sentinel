@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 
 logging.basicConfig(
-    filename="test.log",
+    filename="network.log",
     level=logging.INFO,
     format="%(asctime)s | %(levelname)s | %(message)s"
 )
