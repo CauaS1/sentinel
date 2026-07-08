@@ -91,8 +91,6 @@ def table_exists():
         description VARCHAR(50) )
     """)
         
-
-
 def snifferFunction():
     # Sniffing the enp0s3 interface for IP packets, storing is true
     packets = sniff(iface=jsonConfig["database"]["interface"], filter="ip", store=True, count=jsonConfig["database"]["count"]) 
@@ -101,14 +99,12 @@ def snifferFunction():
     # Fixing the timestamp from the response
     fixedTime = datetime.fromtimestamp(packets[1].time)
 
-    
     le = len(packets)
     print(le)
 
-    i = 0
-    while i < le:
+    for p in packets:
         # Converting the number related to the protocol to its formal name
-        protoNum = packets[i][IP].proto
+        protoNum = p[IP].proto
 
         if protoNum == 1:
             protocol = 'ICMP'
@@ -118,10 +114,10 @@ def snifferFunction():
             protocol = 'TCP'
 
         timestp = str(fixedTime)
-        src_mac = str(packets[i][Ether].src)
-        dst_mac = str(packets[i][Ether].dst)
-        src_ip = str(packets[i][IP].src)
-        dst_ip = str(packets[i][IP].dst)
+        src_mac = str(p[Ether].src)
+        dst_mac = str(p[Ether].dst)
+        src_ip = str(p[IP].src)
+        dst_ip = str(p[IP].dst)
         protoc = str(protocol)
 
         log.eventLogger(src_mac, dst_mac, src_ip, dst_ip, protoc, level="info")
@@ -139,7 +135,6 @@ def snifferFunction():
         conn.commit() # Don't forget to commit the changes into the db
 
 
-        i = i + 1
 
 def floodPacketsAlert():
     cursor.execute("""
