@@ -73,6 +73,25 @@ def table_exists():
         source_ip VARCHAR(20) UNIQUE )
     """)
         
+    # Checks if the whitelist database exitis
+    cursor.execute("""
+        SELECT EXISTS (
+            SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA = 'soc_lab' AND TABLE_NAME = 'whitelist'
+            ) AS table_exists
+    """)
+
+    whitelist = cursor.fetchall()
+    whitelist  = whitelist[0][0]
+        
+    if whitelist == 0:
+        cursor.execute("""CREATE TABLE whitelist ( \
+        id INT AUTO_INCREMENT PRIMARY KEY, 
+        src_ip VARCHAR(20),
+        description VARCHAR(50) )
+    """)
+        
+
 
 def snifferFunction():
     # Sniffing the enp0s3 interface for IP packets, storing is true
@@ -188,7 +207,6 @@ def floodPacketsAlert():
 
                 conn.commit()
         
-
 def blacklistAdd():
     cursor.execute("SELECT * FROM triggered_alerts")
 
@@ -226,6 +244,18 @@ def blacklistAdd():
 
             firewall.firewallFunc(ip, 'deny', 'in')
 
+def whitelist():
+    
+    cursor.execute("""
+    SELECT * FROM whitelist
+    """)
+
+    allowedIps = cursor.fetchall()
+
+    for a in allowedIps:
+        print(a[1], a[2])
+
+        firewall.firewallFunc(a[1], "allow", "out")
 
 def artificialData():
     i = 0
@@ -243,8 +273,10 @@ def artificialData():
         i = i + 1
     
 
+
 table_exists()
 blacklistAdd()
 snifferFunction()
+whitelist()
 #artificialData()
 floodPacketsAlert()
