@@ -105,6 +105,7 @@ def snifferFunction():
     print(le)
 
     for p in packets:
+
         # Converting the number related to the protocol to its formal name
         protoNum = p[IP].proto
 
@@ -121,8 +122,13 @@ def snifferFunction():
         src_ip = str(p[IP].src)
         dst_ip = str(p[IP].dst)
         protoc = str(protocol)
-        dst_port = str(p[TCP].dport)
-        src_port = str(p[TCP].sport)
+        
+        try:
+            dst_port = str(p[TCP].dport)
+            src_port = str(p[TCP].sport)
+        except IndexError:
+            dst_port = "None"
+            src_port = "None"
 
         log.eventLogger(src_mac, dst_mac, src_ip, dst_ip, protoc, level="info")
 
